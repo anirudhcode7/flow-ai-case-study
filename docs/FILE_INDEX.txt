@@ -1,0 +1,308 @@
+================================================================================
+FLOWAI DATA ENGINEERING CASE STUDY - FILE INDEX & GUIDE
+================================================================================
+
+RESEARCH COMPLETED: April 2, 2026
+STATUS: Ready for Implementation Phase 2
+LOCATION: ~/Downloads/
+
+================================================================================
+FILES IN THIS DIRECTORY
+================================================================================
+
+1. START_HERE.md (8.8 KB) ⭐ READ THIS FIRST
+   └─ Navigation guide, quick overview, getting started checklist
+   └─ Time to read: 5-10 minutes
+   └─ What you'll learn: How to use all these documents
+
+2. FlowAI_Case_Study_Cheat_Sheet.md (11 KB) ⭐ QUICK REFERENCE
+   └─ One-page summary of all schemas, entity resolution, BI queries
+   └─ Time to read: 10-15 minutes
+   └─ What you'll learn: Schemas at a glance + strategy overview
+
+3. RESEARCH_SUMMARY.txt (15 KB) - EXECUTIVE SUMMARY
+   └─ What FlowAI needs, data sources, roadmap, key decisions
+   └─ Time to read: 15-20 minutes
+   └─ What you'll learn: Complete overview of findings
+
+4. FlowAI_DE_Case_Study_Research_Plan.md (21 KB) - COMPREHENSIVE
+   └─ Full requirements, all schemas, 6-phase plan, tech recommendations
+   └─ Time to read: 30-45 minutes
+   └─ What you'll learn: Complete planning guide with details
+
+5. Data_Sources_Reference.md (14 KB) - DOWNLOAD GUIDE
+   └─ Every data source with links, setup instructions, FAQ
+   └─ Time to read: 20-30 minutes
+   └─ What you'll learn: How to get and use each data source
+
+6. DE Case Study.pdf (316 KB) - ORIGINAL CASE STUDY
+   └─ FlowAI's official 17-page case study document
+   └─ Time to read: 20-30 minutes
+   └─ What you'll learn: Exact requirements from FlowAI
+
+7. FILE_INDEX.txt (this file)
+   └─ Quick reference for all documents
+
+================================================================================
+RECOMMENDED READING PATH
+================================================================================
+
+QUICK START (30 minutes):
+  1. Read: START_HERE.md (5 min)
+  2. Read: FlowAI_Case_Study_Cheat_Sheet.md (10 min)
+  3. Skim: RESEARCH_SUMMARY.txt (15 min)
+
+BEFORE STARTING PHASE 2 (2 hours):
+  1. Review: FlowAI_DE_Case_Study_Research_Plan.md (45 min)
+  2. Study: Data_Sources_Reference.md (45 min)
+  3. Scan: DE Case Study.pdf (30 min)
+
+FOR IMPLEMENTATION (Reference as needed):
+  - Data_Sources_Reference.md when downloading/setting up data
+  - FlowAI_Case_Study_Cheat_Sheet.md for quick schema lookups
+  - FlowAI_DE_Case_Study_Research_Plan.md for detailed guidance
+  - DE Case Study.pdf for exact requirements
+
+================================================================================
+DOCUMENT CONTENTS SUMMARY
+================================================================================
+
+START_HERE.md
+  • How to use all documents
+  • 60-second project overview
+  • Technology recommendations
+  • Common Q&A
+  • Next action items
+  
+FlowAI_Case_Study_Cheat_Sheet.md
+  • All source schemas (EMR, RCM, Referral Orders)
+  • All target schemas (Patient 360, Identity Graph, Star Schema)
+  • Entity resolution strategy (deterministic + probabilistic)
+  • BI query examples
+  • Data quality requirements
+  • HIPAA safeguards checklist
+  • Tech stack overview
+  • Evaluation rubric
+
+RESEARCH_SUMMARY.txt
+  • What the case study requires (3 components)
+  • All data sources with URLs
+  • 6-phase implementation roadmap
+  • Technical stack overview
+  • Deliverables checklist
+  • Key decision points
+  • Next immediate actions
+  • Questions to clarify with FlowAI
+
+FlowAI_DE_Case_Study_Research_Plan.md
+  • Case study context & requirements (sections 1-3)
+  • All provided sample schemas (sections 4-5)
+  • Target data models (section 5)
+  • 6-phase plan with deliverables (section 6)
+  • Technical stack (section 7)
+  • Best practices & considerations (section 8)
+  • Dataset combination strategy (section 9)
+  • Actionable next steps (section 10)
+  • Full references & sources
+
+Data_Sources_Reference.md
+  • Tier 1: Essential sources (Synthea, CMS NPPES, synthetic data)
+  • Tier 2: Validation sources (MIMIC-IV)
+  • Tier 3: Exploration sources (Kaggle, GitHub)
+  • Setup time and cost for each
+  • Direct download links
+  • How to use each for the project
+  • Quick reference table
+  • Recommended MVP combination
+  • Implementation sequence
+  • Local directory structure
+  • Troubleshooting FAQ
+
+DE Case Study.pdf
+  • Official 17-page FlowAI case study
+  • Context & scope
+  • Exact deliverable requirements (A/B/C)
+  • Evaluation rubric
+  • Provided sample schemas
+  • Target data models
+  • BI question examples
+
+================================================================================
+QUICK FACTS
+================================================================================
+
+Total Documentation: 2,082 lines of detailed planning
+Data Sources Identified: 7 (Synthea, NPPES, synthetic, MIMIC-IV, X12, Kaggle, guides)
+Implementation Phases: 6 (Research → Data → Ingestion → Resolution → Analytics → Docs)
+Estimated Timeline: 14-18 days (MVP), 3-4 weeks (with BI)
+No Code Written: 0 lines (research only)
+No Data Generated: 0 bytes (ready for Phase 2)
+
+================================================================================
+WHAT YOU NEED TO BUILD
+================================================================================
+
+1. DATA INGESTION ARCHITECTURE
+   └─ Multi-source (EMR, RCM, Referral Orders)
+   └─ Bronze → Silver → Gold medallion pattern
+   └─ Data quality controls & HIPAA safeguards
+
+2. PATIENT 360 & ENTITY RESOLUTION
+   └─ Deterministic matching (MRN, SSN-last4, phone, email)
+   └─ Probabilistic matching (name + DOB + address similarity)
+   └─ Provider/Counterparty identity graphs (NPI-based)
+   └─ Confidence scoring & crosswalks
+
+3. ANALYTICS FRAMEWORK & BI
+   └─ Star schema (dimensions + facts)
+   └─ Sample dashboards (AR, denial rates, balances)
+   └─ BI-ready semantic layer
+
+================================================================================
+CRITICAL SUCCESS FACTORS
+================================================================================
+
+1. Entity Resolution (20% score) - Get matching logic right, test thoroughly
+2. Data Quality (20% score) - Define tests, monitor freshness & completeness
+3. Architecture (30% score) - Design for lineage, replayability, evolution
+4. Documentation (implicit) - Write solution brief explaining trade-offs
+5. Pragmatism (10% score) - Show MVP vs production thinking
+
+================================================================================
+DATA SOURCES AT A GLANCE
+================================================================================
+
+ESSENTIAL (MVP):
+  • Synthea (Synthetic EMR): https://synthetichealth.github.io/synthea/
+    └─ Generates: EMR patient, encounter, diagnosis, procedure data
+    └─ Time: 15 min setup, generates 1K patients in <5 min
+    └─ Cost: Free
+
+  • CMS NPPES (Real providers): https://download.cms.gov/nppes/NPI_Files.html
+    └─ Provides: 10-digit NPI provider directory
+    └─ Time: 5 min download, ~1.5 GB compressed
+    └─ Cost: Free
+
+  • Synthetic Claims (You generate): Custom Python script
+    └─ Maps: Synthea encounters to RCM claims
+    └─ Time: 1-2 hours to build script
+    └─ Cost: Free
+
+  • Synthetic Referrals (You generate): Custom Python script
+    └─ Generates: Referral orders with counterparties
+    └─ Time: 1-2 hours to build script
+    └─ Cost: Free
+
+OPTIONAL (Validation):
+  • MIMIC-IV (Real clinical): https://physionet.org/content/mimiciv/3.1/
+    └─ Provides: De-identified ICU/ED data for validation
+    └─ Time: 2-4 hours (training + DUA)
+    └─ Cost: Free (requires Data Use Agreement)
+
+REFERENCE:
+  • X12 835 (Claims standard): https://www.cms.gov/medicare/billing/electronicbillingeditrans/downloads/835-flatfile.pdf
+    └─ Specifies: Remittance advice format
+    └─ Time: 1 hour to review
+    └─ Cost: Free
+
+================================================================================
+TECHNOLOGY STACK
+================================================================================
+
+Languages:        Python + SQL
+Database:         Snowflake / BigQuery / Redshift (or PostgreSQL for MVP)
+Transformation:   dbt (recommended) or custom Python
+Entity Matching:  pandas, fuzzywuzzy, recordlinkage
+Data Quality:     dbt tests + Great Expectations
+Security:         AWS KMS/Vault, RBAC, encrypted connections
+BI/Dashboards:    Tableau / Looker / Power BI
+
+Key Libraries:
+  - pandas: Data manipulation
+  - pydantic: Schema validation
+  - fuzzywuzzy: String similarity matching
+  - recordlinkage: Entity resolution
+  - dbt: SQL transformation & testing
+
+================================================================================
+NEXT ACTIONS (IN ORDER)
+================================================================================
+
+IMMEDIATELY:
+  1. Read START_HERE.md (5 min)
+  2. Read FlowAI_Case_Study_Cheat_Sheet.md (10 min)
+  3. Understand the 3 core deliverables
+
+BEFORE STARTING CODE:
+  4. Read FlowAI_DE_Case_Study_Research_Plan.md (45 min)
+  5. Review Data_Sources_Reference.md (30 min)
+  6. Clarify with FlowAI: data preference, timeline, scale
+
+WHEN READY FOR PHASE 2:
+  7. Clone Synthea: git clone https://github.com/synthetichealth/synthea.git
+  8. Download CMS NPPES: https://download.cms.gov/nppes/NPI_Files.html
+  9. Generate synthetic patients: ./run_synthea.sh -p 1000
+  10. Create claims generator script
+  11. Create referral generator script
+  12. Start mapping to schemas (Phase 2)
+
+================================================================================
+QUESTIONS?
+================================================================================
+
+"What should I read first?"
+→ START_HERE.md (5 min) then FlowAI_Case_Study_Cheat_Sheet.md (10 min)
+
+"How do I get the data?"
+→ Data_Sources_Reference.md (has direct links & setup instructions)
+
+"What exactly should I build?"
+→ FlowAI_Case_Study_Cheat_Sheet.md (schemas) + DE Case Study.pdf (requirements)
+
+"What's the timeline?"
+→ RESEARCH_SUMMARY.txt or FlowAI_DE_Case_Study_Research_Plan.md (14-18 days MVP)
+
+"Which data sources should I use?"
+→ Data_Sources_Reference.md section 5 (recommended MVP combination)
+
+"What will I be scored on?"
+→ FlowAI_Case_Study_Cheat_Sheet.md (evaluation rubric)
+
+================================================================================
+DOCUMENT STATISTICS
+================================================================================
+
+Total Lines: 2,082 (across all markdown and text files)
+Total Words: ~22,000 (comprehensive coverage)
+Markdown Files: 5 (2,082 total lines)
+PDF File: 1 (original case study)
+
+Coverage Areas:
+  • Requirements Analysis: ✓ Complete
+  • Schema Documentation: ✓ Complete (all EMR, RCM, referral sources)
+  • Target Models: ✓ Complete (Patient 360, Identity Graph, Star Schema)
+  • Entity Resolution Strategy: ✓ Complete (deterministic + probabilistic)
+  • Data Sources: ✓ Complete (7 sources identified with links)
+  • Implementation Roadmap: ✓ Complete (6 phases with deliverables)
+  • Technical Recommendations: ✓ Complete (stack, languages, libraries)
+  • Best Practices: ✓ Complete (quality, governance, HIPAA, scaling)
+  • Setup Instructions: ✓ Complete (step-by-step for each data source)
+  • FAQ & Troubleshooting: ✓ Complete
+
+================================================================================
+VERSION & STATUS
+================================================================================
+
+Document Version: 1.0
+Created: April 2, 2026
+Status: ✅ Research & Planning Complete
+Phase: Phase 1 / 6 Complete
+Ready for: Phase 2 (Data Preparation)
+
+No code written
+No data generated
+No infrastructure set up
+
+Next milestone: Data sources downloaded, synthetic data generated
+
+================================================================================
