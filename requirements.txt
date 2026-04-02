@@ -1,0 +1,5 @@
+pandas>=2.0
+numpy>=1.24
+duckdb>=1.0
+faker>=26.0
+# anthropic NOT needed - using Claude Code CLI via subprocess

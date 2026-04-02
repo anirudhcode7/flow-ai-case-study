@@ -1,0 +1,112 @@
+snomed_code,snomed_description,cpt_code,cpt_description
+385763009,Office visit outpatient,99213,Office or other outpatient visit established patient moderate complexity
+386053000,Urinalysis,81003,Urinalysis automated without microscopy
+710824005,Preventive medicine evaluation,99395,Periodic comprehensive preventive medicine established patient 18-39 years
+430193006,Electrocardiogram,93000,Electrocardiogram routine ECG with at least 12 leads
+252160004,Chest X-ray,71046,Radiologic examination chest 2 views
+167252002,Complete blood count,85025,Blood count complete CBC automated
+182836005,Immunization administration,90471,Immunization administration percutaneous intradermal subcutaneous or intramuscular injection
+11429006,Consultation,99243,Office consultation new or established patient moderate complexity
+308335008,Patient encounter procedure,99214,Office or other outpatient visit established patient moderate-high complexity
+225317005,Removal of sutures,99213,Office or other outpatient visit established patient moderate complexity
+410620009,Well child visit,99393,Periodic comprehensive preventive medicine established patient 5-11 years
+424400008,Throat culture,87070,Culture bacterial definitive other source
+309434009,Blood glucose measurement,82947,Glucose quantitative blood
+23426006,Spirometry,94010,Spirometry including graphic record total and timed vital capacity
+396075005,Influenza vaccination,90658,Influenza virus vaccine split virus for intramuscular use
+25267002,Insertion of catheter,51702,Insertion of temporary indwelling bladder catheter
+73761001,Colonoscopy,45378,Colonoscopy flexible proximal to splenic flexure
+44608003,Sigmoidoscopy,45330,Sigmoidoscopy flexible diagnostic
+34074006,Tonometry,92100,Serial tonometry with multiple measurements of intraocular pressure
+359953006,Glaucoma screening,92014,Ophthalmological services medical examination and evaluation established patient comprehensive
+119373006,Urine culture,87086,Culture bacterial urine quantitative colony count
+14633002,Nebulizer treatment,94640,Pressurized inhalation treatment for acute airway obstruction
+15648007,Bone density measurement,77080,Dual-energy X-ray absorptiometry DXA bone density scan axial skeleton
+268400002,Lipid panel,80061,Lipid panel blood test
+84095007,Thyroid function test,84443,Thyroid stimulating hormone TSH
+275711006,Serum creatinine,82565,Creatinine blood
+59651002,Urine drug screen,80307,Drug test presumptive any number of drug classes
+118291006,Physical examination,99213,Office or other outpatient visit established patient moderate complexity
+363680008,Radiologic procedure,73110,Radiologic examination wrist complete minimum of 3 views
+241678007,MRI brain,70553,Magnetic resonance imaging brain without and with contrast material
+429068005,CT scan chest,71250,Computed tomography thorax diagnostic without contrast
+311434004,Ultrasound abdomen,76700,Ultrasound abdominal real time with image documentation complete
+371244009,Doppler ultrasound,93971,Duplex scan unilateral or limited study lower extremity arteries or arterial bypass grafts
+413088001,Stress echocardiogram,93350,Echocardiography transthoracic real-time with image documentation during exercise
+442581004,Cardiac catheterization,93458,Cardiac catheterization with left heart catheterization
+84114007,Heart failure care,99223,Initial hospital care per day high complexity
+40443006,Psychiatry evaluation,90792,Psychiatric diagnostic evaluation with medical services
+410607006,Substance use disorder counseling,99213,Office or other outpatient visit established patient moderate complexity
+266717002,Insulin injection,99213,Office or other outpatient visit established patient moderate complexity
+398162005,Physical therapy evaluation,97001,Physical therapy evaluation
+229070002,Occupational therapy,97003,Occupational therapy evaluation
+229070002,Speech therapy evaluation,92521,Evaluation of speech fluency
+392021009,Tonsillectomy,42821,Tonsillectomy and adenoidectomy under age 12
+173171007,Appendectomy,44950,Appendectomy
+387713003,Surgical procedure,99232,Subsequent hospital care per day moderate complexity
+18286008,Laparoscopic cholecystectomy,47562,Laparoscopy surgical cholecystectomy
+67992006,Arthroscopy knee,29881,Arthroscopy knee surgical with meniscectomy
+397956004,Total hip replacement,27130,Arthroplasty acetabular and proximal femoral prosthetic replacement
+443681008,Total knee replacement,27447,Arthroplasty knee condyle and plateau medial and lateral compartments
+408516003,Cataract extraction,66984,Extracapsular cataract removal with insertion of intraocular lens prosthesis
+430140008,Carpal tunnel release,64721,Neuroplasty and/or transposition median nerve carpal tunnel
+274093009,Lumbar puncture,62270,Spinal puncture lumbar diagnostic
+232717009,Coronary artery bypass graft,33533,Coronary artery bypass using arterial graft single
+361058006,Coronary stent placement,92928,Percutaneous transcatheter placement of intracoronary stent single vessel
+384730009,Cardiopulmonary resuscitation,92950,Cardiopulmonary resuscitation
+304252001,Dialysis,90935,Hemodialysis procedure with single evaluation by a physician or other qualified health care professional
+3950001,Birth,59400,Routine obstetric care including antepartum care vaginal delivery and postpartum care
+177184002,Cesarean delivery,59510,Routine obstetric care including antepartum care cesarean delivery and postpartum care
+46651001,Hysterectomy,58150,Total abdominal hysterectomy corpus and cervix with or without removal of tube or ovary
+387644004,Mastectomy,19303,Mastectomy simple complete
+55705006,Prostatectomy,55840,Prostatectomy retropubic radical with or without nerve sparing
+77477000,Radiation therapy,77385,Intensity modulated radiation treatment delivery
+31436004,Chemotherapy,96413,Chemotherapy administration intravenous infusion technique up to one hour
+35174006,IV infusion therapy,96365,Intravenous infusion for therapy prophylaxis or diagnosis first hour
+57493002,Wound care,97597,Debridement open wound including topical application wound assessment
+53876009,Urinary catheter removal,51700,Bladder irrigation simple lavage or instillation
+416940007,Nasogastric tube insertion,43752,Naso- or oro-gastric tube placement
+182992009,Drug administration,99070,Supplies and materials provided by physician over and above those usually included
+54135002,Vaccination,90732,Pneumococcal polysaccharide vaccine 23-valent adult or immunosuppressed patient dosage for subcutaneous or intramuscular use
+68498005,Hepatitis B vaccine,90746,Hepatitis B vaccine adult dosage for intramuscular use
+84135009,MMR vaccine,90707,Measles mumps and rubella virus vaccine live for subcutaneous use
+698354004,Varicella vaccine,90716,Varicella virus vaccine live for subcutaneous use
+350357007,Meningococcal vaccine,90734,Meningococcal polysaccharide vaccine serogroups A C Y and W-135 combined for subcutaneous use
+170433008,HPV vaccine,90651,Human Papillomavirus vaccine 9-valent types 6 11 16 18 31 33 45 52 58 for intramuscular use
+413473000,Tdap vaccine,90715,Tetanus toxoid and acellular pertussis vaccine for intramuscular use
+786478005,COVID-19 vaccine,91300,SARS-CoV-2 mRNA vaccine Pfizer-BioNTech for intramuscular use
+234723000,Bone marrow biopsy,38220,Bone marrow aspiration
+122549003,Blood transfusion,36430,Transfusion of blood
+52250000,Cystoscopy,52000,Cystourethroscopy separate procedure
+447996002,Bronchoscopy,31622,Bronchoscopy rigid or flexible diagnostic with bronchoalveolar lavage
+168537006,Upper endoscopy,43235,Esophagogastroduodenoscopy EGD diagnostic
+180206006,Emergency department visit,99285,Emergency department visit high complexity
+11429006,New patient office visit,99205,Office or other outpatient visit new patient high complexity
+310582000,Diabetic foot exam,11055,Paring or cutting of benign hyperkeratotic lesion corn or callus single lesion
+225334002,Blood pressure monitoring,93784,Ambulatory blood pressure monitoring utilizing a system such as magnetic tape and/or computer disk
+233604007,Pulmonary function test,94060,Bronchodilation responsiveness spirometry as in 94010 before and after bronchodilator
+229799001,Wound debridement,97602,Removal of devitalized tissue from wound non-selective debridement without anesthesia
+243796009,Situation examination,99213,Office or other outpatient visit established patient moderate complexity
+31099001,Post-operative visit,99024,Postoperative follow-up visit included in surgical package
+260385009,Negative finding examination,99213,Office or other outpatient visit established patient moderate complexity
+19887002,Pap smear,88141,Cytopathology cervical or vaginal manual screening under physician supervision
+172524000,Mammography,77067,Screening mammography bilateral two-view
+81740001,Prostate-specific antigen,86316,Immunoassay for analyte quantitative not otherwise specified
+41999001,Skin biopsy,11100,Biopsy of skin subcutaneous tissue and/or mucous membrane single lesion
+82354003,Intradermal injection,96372,Therapeutic prophylactic or diagnostic injection subcutaneous or intramuscular
+373110003,Allergy skin test,95004,Percutaneous tests sequential and incremental with allergenic extracts for airborne allergens
+180461008,Allergy immunotherapy,95115,Professional services for allergen immunotherapy not including provision of allergenic extracts single injection
+710925007,Suture laceration,12001,Simple repair of superficial wounds of scalp neck axillae external genitalia trunk or extremities 2.5 cm or less
+274031008,Emergency intubation,31500,Intubation endotracheal emergency procedure
+47545007,Defibrillation,92960,Cardioversion elective electrical conversion of arrhythmia
+168187007,ECG monitoring,93040,Rhythm ECG one to three leads
+312993001,Phlebotomy,36415,Collection of venous blood by venipuncture
+396550006,Blood culture,87040,Culture bacterial blood aerobic
+47978003,Urine analysis,81002,Urinalysis manual without microscopy
+104375008,Rapid strep test,87880,Infectious agent antigen detection by immunoassay with direct optical Group A Streptococcus
+47015008,Influenza test,87804,Infectious agent antigen detection by immunoassay influenza virus type B
+168537006,Flu rapid test,87502,Infectious agent detection by nucleic acid influenza virus types A and B
+118434003,HIV test,86701,Antibody HIV-1
+11911009,Hepatitis panel,80074,Acute hepatitis panel
+15220000,Laboratory panel,80053,Comprehensive metabolic panel
+74770003,Basic metabolic panel,80047,Basic metabolic panel calcium ionized
