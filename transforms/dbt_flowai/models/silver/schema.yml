@@ -1,0 +1,409 @@
+version: 2
+
+models:
+  - name: silver_emr_patient
+    description: "Deduplicated and typed EMR patient records"
+    columns:
+      - name: emr_patient_id
+        tests:
+          - unique
+          - not_null
+      - name: mrn
+        tests:
+          - not_null
+      - name: first_name
+        tests:
+          - not_null
+      - name: last_name
+        tests:
+          - not_null
+      - name: dob
+        tests:
+          - not_null
+      - name: sex
+        tests:
+          - accepted_values:
+              values: ['M', 'F', 'O', 'U']
+      - name: state
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 2
+      - name: phone
+        tests:
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: '^[0-9]{10,11}$'
+              severity: warn
+      - name: zip
+        tests:
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: '^[0-9]{5}$'
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_emr_encounter
+    description: "Deduplicated and typed EMR encounter records"
+    columns:
+      - name: emr_encounter_id
+        tests:
+          - unique
+          - not_null
+      - name: emr_patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver_emr_patient')
+              field: emr_patient_id
+      - name: start_time
+        tests:
+          - not_null
+      - name: encounter_type
+        tests:
+          - accepted_values:
+              values: ['outpatient', 'inpatient', 'ed']
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['planned', 'in-progress', 'completed', 'cancelled']
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_emr_diagnosis
+    description: "Deduplicated and typed EMR diagnosis records"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - emr_encounter_id
+            - icd10_code
+    columns:
+      - name: emr_encounter_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver_emr_encounter')
+              field: emr_encounter_id
+      - name: icd10_code
+        tests:
+          - not_null
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_emr_procedure
+    description: "Deduplicated and typed EMR procedure records"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - emr_encounter_id
+            - cpt_code
+    columns:
+      - name: emr_encounter_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver_emr_encounter')
+              field: emr_encounter_id
+      - name: cpt_code
+        tests:
+          - not_null
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_emr_provider
+    description: "Deduplicated and typed EMR provider records"
+    columns:
+      - name: emr_provider_id
+        tests:
+          - unique
+          - not_null
+      - name: npi
+        tests:
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: '^[0-9]{10}$'
+              row_condition: "npi is not null"
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_rcm_patient_account
+    description: "Deduplicated and typed RCM patient account records"
+    columns:
+      - name: rcm_account_id
+        tests:
+          - unique
+          - not_null
+      - name: patient_external_id
+        tests:
+          - not_null
+      # emr_patient_id intentionally ~30% NULL — no not_null test
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_rcm_claim_header
+    description: "Deduplicated and typed RCM claim header records"
+    columns:
+      - name: claim_id
+        tests:
+          - unique
+          - not_null
+      - name: rcm_account_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver_rcm_patient_account')
+              field: rcm_account_id
+      - name: total_charge_amount
+        tests:
+          - not_null
+      - name: claim_status
+        tests:
+          - accepted_values:
+              values: ['submitted', 'accepted', 'denied', 'paid', 'void']
+      - name: claim_type
+        tests:
+          - accepted_values:
+              values: ['institutional', 'professional']
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_rcm_claim_line
+    description: "Deduplicated and typed RCM claim line records"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - line_num
+    columns:
+      - name: claim_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver_rcm_claim_header')
+              field: claim_id
+      - name: line_num
+        tests:
+          - not_null
+      - name: cpt_code
+        tests:
+          - not_null
+      - name: charge_amount
+        tests:
+          - not_null
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_rcm_remittance_835
+    description: "Deduplicated and typed RCM remittance 835 records"
+    columns:
+      - name: remit_id
+        tests:
+          - unique
+          - not_null
+      - name: payer_id
+        tests:
+          - not_null
+      - name: payment_date
+        tests:
+          - not_null
+      - name: total_payment_amount
+        tests:
+          - not_null
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_rcm_ar_balance_snapshot
+    description: "Deduplicated and typed RCM AR balance snapshot records"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - snapshot_date
+            - claim_id
+    columns:
+      - name: snapshot_date
+        tests:
+          - not_null
+      - name: claim_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver_rcm_claim_header')
+              field: claim_id
+      - name: rcm_account_id
+        tests:
+          - not_null
+      - name: aging_bucket
+        tests:
+          - accepted_values:
+              values: ['0-30', '31-60', '61-90', '90+']
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_referral_order
+    description: "Deduplicated and typed referral order records"
+    columns:
+      - name: referral_order_id
+        tests:
+          - unique
+          - not_null
+      - name: patient_first_name
+        tests:
+          - not_null
+      - name: patient_last_name
+        tests:
+          - not_null
+      - name: dob
+        tests:
+          - not_null
+      - name: priority
+        tests:
+          - accepted_values:
+              values: ['routine', 'urgent']
+      - name: order_status
+        tests:
+          - accepted_values:
+              values: ['received', 'scheduled', 'completed', 'cancelled']
+      - name: counterparty_org_type
+        tests:
+          - accepted_values:
+              values: ['law_firm', 'pi_firm', 'clinic', 'employer']
+      # referring_provider_npi is intentionally ~20% NULL — no not_null test
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_referral_order_status_history
+    description: "Deduplicated and typed referral order status history records"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - referral_order_id
+            - status
+            - status_time
+    columns:
+      - name: referral_order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver_referral_order')
+              field: referral_order_id
+      - name: status
+        tests:
+          - not_null
+      - name: status_time
+        tests:
+          - not_null
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
+
+  - name: silver_referral_document_reference
+    description: "Deduplicated and typed referral document reference records"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - referral_order_id
+            - doc_type
+            - doc_uri
+    columns:
+      - name: referral_order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('silver_referral_order')
+              field: referral_order_id
+      - name: doc_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['referral_form', 'imaging', 'insurance_card']
+      - name: doc_uri
+        tests:
+          - not_null
+      - name: _ingested_at
+        tests:
+          - not_null
+      - name: _source_system
+        tests:
+          - not_null
+      - name: _row_hash
+        tests:
+          - not_null
