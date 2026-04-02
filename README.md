@@ -112,8 +112,10 @@ flow-ai/
 │       ├── schema.sql         # 13 bronze table DDL
 │       └── load_bronze.py     # CSV → DuckDB loader
 ├── transform/
-│   ├── silver/                # (Phase 2)
-│   └── gold/                  # (Phase 3)
+│   └── dbt_flowai/            # dbt-duckdb project (Silver layer — Phase 2)
+│       ├── models/staging/    # 13 thin views over bronze sources
+│       ├── models/silver/     # 13 typed, deduped Silver tables
+│       └── SILVER_LAYER.md    # Transformation docs and test results
 ├── entity_resolution/         # (Phase 4)
 ├── analytics/                 # (Phase 5)
 ├── data/

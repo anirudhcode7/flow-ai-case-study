@@ -8,7 +8,7 @@ The Silver layer reads from 13 Bronze tables (all VARCHAR), applies type casting
 
 ```bash
 # Prerequisites: pip3 install dbt-duckdb
-# Run from this directory (transforms/dbt_flowai/)
+# Run from this directory (transform/dbt_flowai/)
 
 dbt deps --profiles-dir .         # Install dbt-utils and dbt-expectations packages
 dbt run --profiles-dir .          # Build all 26 models (13 staging views + 13 silver tables)
@@ -156,7 +156,7 @@ These failures demonstrate the data quality framework working correctly: invalid
 ## Project Structure
 
 ```
-transforms/dbt_flowai/
+transform/dbt_flowai/
 ├── dbt_project.yml          — staging: view, silver: table
 ├── profiles.yml             — DuckDB connection (../../data/duckdb/flowai.duckdb)
 ├── packages.yml             — dbt-labs/dbt_utils, calogica/dbt_expectations
