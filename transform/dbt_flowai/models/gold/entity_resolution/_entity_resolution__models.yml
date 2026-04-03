@@ -1,0 +1,113 @@
+version: 2
+
+models:
+  - name: int_patient_spine
+    description: "Union of all patient records from EMR, RCM, Referral into common shape"
+    columns:
+      - name: source_patient_key
+        tests:
+          - not_null
+      - name: source_system
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['emr', 'rcm', 'referral']
+
+  - name: int_patient_match_deterministic
+    description: "High-confidence matches using exact identifier matching"
+    columns:
+      - name: source_key_a
+        tests:
+          - not_null
+      - name: source_key_b
+        tests:
+          - not_null
+      - name: confidence
+        tests:
+          - not_null
+      - name: match_method
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'deterministic_id_link'
+                - 'deterministic_mrn'
+                - 'deterministic_ssn_dob'
+                - 'deterministic_phone_dob'
+                - 'deterministic_email_dob'
+                - 'deterministic_phone_lastname'
+
+  - name: int_patient_match_probabilistic
+    description: "Fuzzy matches using weighted similarity scoring"
+    columns:
+      - name: confidence
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.70
+              max_value: 1.0
+
+  - name: int_patient_match_final
+    description: "All matches merged with canonical patient IDs assigned"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - source_system
+            - source_patient_key
+    columns:
+      - name: patient_id
+        tests:
+          - not_null
+      - name: source_system
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['emr', 'rcm', 'referral']
+      - name: source_patient_key
+        tests:
+          - not_null
+      - name: match_method
+        tests:
+          - not_null
+
+  - name: gold_dim_patient
+    description: "Canonical patient dimension with survivorship-applied fields"
+    columns:
+      - name: patient_id
+        tests:
+          - unique
+          - not_null
+      - name: best_first_name
+        tests:
+          - not_null
+      - name: best_last_name
+        tests:
+          - not_null
+      - name: best_dob
+        tests:
+          - not_null
+
+  - name: gold_bridge_patient_source_xref
+    description: "Crosswalk mapping source system IDs to canonical patient IDs"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_id
+            - source_system
+            - source_patient_key
+    columns:
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('gold_dim_patient')
+              field: patient_id
+      - name: source_system
+        tests:
+          - not_null
+      - name: source_patient_key
+        tests:
+          - not_null
+      - name: match_confidence
+        tests:
+          - not_null
