@@ -1,6 +1,26 @@
 # FlowAI Healthcare Data Platform
 
-A synthetic healthcare data engineering platform demonstrating a multi-source Bronze/Silver/Gold DuckDB pipeline with realistic cross-system patient identity challenges.
+End-to-end healthcare data engineering platform: multi-source ingestion (EMR, RCM, Referral Orders), patient entity resolution across conflicting identifiers, and a BI-ready star schema for AR analytics. Built with Python, dbt-duckdb, and SQL.
+
+---
+
+## Quick Start
+
+```bash
+# Setup
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+# Generate data + load Bronze
+python ingestion/generate/run_generate.py --dry-run
+python ingestion/bronze/load_bronze.py
+
+# Build Silver + Gold + Analytics, run all 174 tests
+cd transform/dbt_flowai
+dbt deps --profiles-dir .
+dbt run --profiles-dir .
+dbt test --profiles-dir .
+```
 
 ---
 
@@ -9,8 +29,9 @@ A synthetic healthcare data engineering platform demonstrating a multi-source Br
 | Tool | Version | Notes |
 |------|---------|-------|
 | Python | 3.11+ | `python3 --version` |
-| Java | 17+ | Required to run Synthea |
-| Claude Code CLI | Latest | `claude --version` — used for LLM gap-filling |
+| Java | 17+ | Required to run Synthea (optional with `--dry-run`) |
+| Claude Code CLI | Latest | Optional — used for LLM gap-filling; `--dry-run` skips it |
+| dbt-duckdb | 1.10+ | Installed via `requirements.txt` |
 
 ---
 
@@ -33,62 +54,80 @@ cp .env.example .env
 
 ---
 
-## Step 1: Run Synthea
+## Pipeline Steps
 
-Synthea generates realistic synthetic patient records as CSV.
+### Step 1: Run Synthea (optional)
+
+Synthea generates realistic synthetic patient records as CSV. Skip this step if using `--dry-run` mode.
 
 ```bash
-# Download Synthea (if not already present)
 wget https://github.com/synthetichealth/synthea/releases/latest/download/synthea-with-dependencies.jar
 
-# Generate 600 patients in California (seed 42 for reproducibility)
 java -jar synthea-with-dependencies.jar -s 42 -p 600 \
   --exporter.csv.export=true \
   --exporter.fhir.export=false \
   --exporter.ccda.export=false \
   California
 
-# Copy output to the expected location
 cp -r output/csv/* data/raw/synthea_output/
 ```
 
-Expected files in `data/raw/synthea_output/`:
-- `patients.csv`, `encounters.csv`, `conditions.csv`, `procedures.csv`, `providers.csv`, `organizations.csv`
-
----
-
-## Step 2: Generate Synthetic Data
+### Step 2: Generate Synthetic Data
 
 ```bash
-python ingestion/generate/run_generate.py
+python ingestion/generate/run_generate.py        # Full mode (Synthea + Claude Haiku + Faker)
+python ingestion/generate/run_generate.py --dry-run  # Faker-only, no LLM or Synthea needed
 ```
 
-This runs all 3 generators in order:
-1. **EMR** — transforms Synthea CSVs into 5 EMR tables
-2. **RCM** — generates 5 Revenue Cycle Management tables
-3. **Referral** — generates 3 Personal Injury referral tables
+Runs 3 generators in dependency order (EMR first, then RCM and Referral which depend on EMR patient IDs). Uses a 3-tier generation model:
+- **Tier 1 (Synthea):** Clinically realistic base data
+- **Tier 2 (Claude Haiku):** Contextually coherent gap-filling via CLI subprocess
+- **Tier 3 (Faker):** Mechanical fallback; used exclusively in `--dry-run` mode
 
-Output CSVs land in `data/raw/{emr,rcm,referral}/`.
+Output: 13 CSV files in `data/raw/{emr,rcm,referral}/`.
 
-### Dry-Run Mode (no LLM calls)
-
-```bash
-python ingestion/generate/run_generate.py --dry-run
-```
-
-Skips all Claude Code CLI calls and uses Faker for every field. Use this to test the pipeline without Claude Pro.
-
----
-
-## Step 3: Load Bronze Layer
+### Step 3: Load Bronze Layer
 
 ```bash
 python ingestion/bronze/load_bronze.py
 ```
 
-Reads all CSVs, adds metadata columns (`_source_system`, `_source_file`, `_row_hash`, `_ingested_at`), creates the DuckDB `bronze` schema, and bulk-loads all 13 tables.
+Reads all CSVs, adds metadata columns (`_ingested_at`, `_source_system`, `_source_file`, `_row_hash`), and bulk-loads into DuckDB. All columns stored as VARCHAR (raw landing zone).
 
-DuckDB file: `data/duckdb/flowai.duckdb`
+Output: 13 tables in `bronze` schema of `data/duckdb/flowai.duckdb`.
+
+### Step 4: Build Silver + Gold Layers (dbt)
+
+```bash
+cd transform/dbt_flowai
+dbt deps --profiles-dir .
+dbt run --profiles-dir .
+dbt test --profiles-dir .
+```
+
+This single command builds the entire transformation pipeline:
+
+- **Silver (13 tables):** Type casting via `TRY_CAST`, name/phone/address standardization, deduplication by primary key, enum validation. Contract enforcement on all models.
+- **Gold Entity Resolution (6 models):** Deterministic + probabilistic patient matching, label propagation clustering, survivorship-applied canonical patient dimension + crosswalk.
+- **Gold Analytics (9 models):** Star schema with 6 dimensions, 1 bridge table, and 3 fact tables.
+
+**174 dbt tests** validate uniqueness, not_null constraints, referential integrity, enum values, composite keys, and match confidence bounds.
+
+---
+
+## What This Implements
+
+### A) Ingestion + Storage Architecture
+
+Medallion architecture across 3 layers. Bronze preserves raw data as all-VARCHAR for auditability. Silver enforces typed schemas with `contract: {enforced: true}`, applies standardization (INITCAP names, UPPER addresses, digits-only phones), and deduplicates by primary key. Gold produces business entities and analytics models. Every row carries 4 metadata columns for lineage tracking.
+
+### B) Patient Entity Resolution
+
+Resolves 1,440 source records (500 EMR + 620 RCM + 320 Referral) into **738 canonical patients**. Six deterministic rules (ID link, MRN, SSN+DOB, phone+DOB, email+DOB, phone+lastname) produce 690 high-confidence pair-links. Probabilistic matching via Jaro-Winkler similarity with weighted scoring (name, DOB, phone, address, email) adds 627 fuzzy matches above a 0.70 threshold. Transitive links resolved via 4-pass label propagation. Output: `gold_dim_patient` (canonical records with survivorship) + `gold_bridge_patient_source_xref` (crosswalk with confidence and match method).
+
+### C) Analytics Star Schema
+
+Six dimensions (date, patient, provider, facility, counterparty_org, payer), one bridge table (patient-to-counterparty via referral crosswalk), and three fact tables: `fact_receivable` (claim + snapshot grain, 1,199 rows), `fact_patient_balance` (patient-level AR aggregation), `fact_claim_line` (line-level denial analysis, 31.1% denial rate). Answers 4 BI questions: top counterparties by pending receivables, patients with highest balances, AR aging by payer, and denial rate by payer.
 
 ---
 
@@ -98,64 +137,68 @@ DuckDB file: `data/duckdb/flowai.duckdb`
 flow-ai/
 ├── ingestion/
 │   ├── generate/
-│   │   ├── config.py          # All constants and paths
-│   │   ├── llm_filler.py      # Tier 2: Claude Haiku via CLI subprocess
-│   │   ├── helpers.py         # Tier 3: Faker utilities
-│   │   ├── reference/
-│   │   │   └── snomed_to_cpt_crosswalk.csv
+│   │   ├── config.py              # All constants, paths, messiness rates
+│   │   ├── llm_filler.py          # Tier 2: Claude Haiku via CLI subprocess
+│   │   ├── helpers.py             # Tier 3: Faker utilities + name variants
 │   │   ├── generators/
 │   │   │   ├── emr_from_synthea.py
 │   │   │   ├── rcm.py
 │   │   │   └── referral.py
-│   │   └── run_generate.py    # Master entry point
+│   │   └── run_generate.py        # Master entry point
 │   └── bronze/
-│       ├── schema.sql         # 13 bronze table DDL
-│       └── load_bronze.py     # CSV → DuckDB loader
-├── transform/
-│   └── dbt_flowai/            # dbt-duckdb project (Silver layer — Phase 2)
-│       ├── models/staging/    # 13 thin views over bronze sources
-│       ├── models/silver/     # 13 typed, deduped Silver tables
-│       └── SILVER_LAYER.md    # Transformation docs and test results
-├── entity_resolution/         # (Phase 4)
-├── analytics/                 # (Phase 5)
+│       ├── schema.sql             # 13 bronze table DDL (all VARCHAR)
+│       └── load_bronze.py         # CSV -> DuckDB loader
+├── transform/dbt_flowai/
+│   ├── dbt_project.yml
+│   ├── profiles.yml               # DuckDB connection
+│   ├── packages.yml               # dbt_utils, dbt_expectations
+│   ├── models/
+│   │   ├── staging/               # 13 views over bronze sources
+│   │   ├── silver/                # 13 typed, deduped, validated tables
+│   │   └── gold/
+│   │       ├── entity_resolution/ # Patient spine, matching, dim_patient, crosswalk
+│   │       └── analytics/         # Star schema: dims, bridge, facts
+│   └── target/
 ├── data/
-│   ├── raw/
-│   │   ├── synthea_output/    # Synthea CSVs (gitignored)
-│   │   ├── emr/               # Generated EMR CSVs
-│   │   ├── rcm/               # Generated RCM CSVs
-│   │   └── referral/          # Generated Referral CSVs
-│   └── duckdb/
-│       └── flowai.duckdb      # Single DuckDB file (gitignored)
+│   ├── raw/{emr,rcm,referral}/    # Generated CSVs (gitignored)
+│   └── duckdb/flowai.duckdb       # Single DuckDB file (gitignored)
 └── docs/
+    ├── SOLUTION_BRIEF.md          # Case study submission document
+    ├── ENTITY_RESOLUTION.md       # ER algorithm documentation
+    ├── ANALYTICS_FRAMEWORK.md     # Star schema + BI query docs
+    └── SILVER_LAYER.md            # Silver transformation docs
 ```
 
 ---
 
 ## Data Architecture
 
-### Tiered Generation
-- **Tier 1**: Synthea (Java) — clinically realistic base patient/encounter data
-- **Tier 2**: Claude Haiku via `claude` CLI subprocess — contextually coherent field filling
-- **Tier 3**: Faker — mechanical fallback when LLM unavailable
-
 ### Intentional Messiness (for entity resolution training)
+
 | Issue | Rate | Tables |
 |-------|------|--------|
-| RCM–EMR patient link gaps | 30% | `rcm_patient_account` |
+| RCM-EMR patient link gaps | 30% | `rcm_patient_account` |
 | Null referring NPI | 20% | `referral_order` |
-| DOB year off by ±1 | 10% | Cross-system |
+| DOB year off by +/-1 | 10% | Cross-system |
 | DOB month/day swapped | 5% | Cross-system |
 | Name variants (case, suffix) | ~50% | RCM, Referral |
 
-### Bronze Layer
-All 13 source tables land in the `bronze` schema of `flowai.duckdb`. All columns are `VARCHAR` (raw landing zone). Metadata columns added on ingest: `_ingested_at`, `_source_system`, `_source_file`, `_row_hash`.
+### Layer Summary
+
+| Layer | Tables | Rows | Key Property |
+|-------|-------:|-----:|-------------|
+| Bronze | 13 | 13,050 | All VARCHAR, raw fidelity |
+| Silver | 13 | 12,304 | Typed, deduped, contract-enforced |
+| Gold (ER) | 6 | 5,575 | 738 canonical patients |
+| Gold (Analytics) | 9 | 12,771 | Star schema, 100% dim coverage |
 
 ---
 
-## LLM Gap-Filling Notes
+## Documentation
 
-The pipeline uses the **Claude Code CLI** (`claude` binary) via Python `subprocess`, not the Anthropic Python SDK. This requires:
-- Claude Code CLI installed and authenticated (`claude --version` works)
-- An active Claude Pro subscription
-
-The `--dry-run` flag bypasses all LLM calls for offline / CI use.
+| Document | Description |
+|----------|-------------|
+| `docs/SOLUTION_BRIEF.md` | Full case study submission (Sections A, B, C) |
+| `docs/ENTITY_RESOLUTION.md` | Matching rules, scoring weights, survivorship |
+| `docs/ANALYTICS_FRAMEWORK.md` | Star schema, grain definitions, BI SQL |
+| `docs/SILVER_LAYER.md` | Transformations, test results, row counts |
