@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: emr_patient
+      - name: emr_encounter
+      - name: emr_diagnosis
+      - name: emr_procedure
+      - name: emr_provider
+      - name: rcm_patient_account
+      - name: rcm_claim_header
+      - name: rcm_claim_line
+      - name: rcm_remittance_835
+      - name: rcm_ar_balance_snapshot
+      - name: referral_order
+      - name: referral_order_status_history
+      - name: referral_document_reference

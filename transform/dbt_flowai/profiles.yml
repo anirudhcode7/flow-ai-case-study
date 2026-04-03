@@ -1,0 +1,7 @@
+dbt_flowai:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "../../data/duckdb/flowai.duckdb"
+      schema: silver

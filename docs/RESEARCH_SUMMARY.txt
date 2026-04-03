@@ -1,0 +1,352 @@
+================================================================================
+FLOWAI DATA ENGINEERING CASE STUDY - RESEARCH PHASE COMPLETE
+================================================================================
+
+PROJECT: Candidate Case Study: Staff Data Engineer at FlowAI
+DATE COMPLETED: April 2, 2026
+STATUS: Research & Planning Phase (No Implementation Yet)
+
+================================================================================
+WHAT THE CASE STUDY REQUIRES
+================================================================================
+
+FlowAI is building an AI automation platform for healthcare. You must design an
+end-to-end solution covering:
+
+1. DATA INGESTION ARCHITECTURE
+   - Ingest from 3 sources: EMR (clinical), RCM (billing), Referral Orders
+   - Multi-source connectivity (APIs, batch files, webhooks)
+   - Landing zone with medallion approach (Bronze → Silver → Gold)
+   - Data quality controls (freshness, completeness, duplicates, integrity)
+   - PHI encryption and HIPAA compliance
+
+2. PATIENT 360 & ENTITY RESOLUTION
+   - Resolve patient identities across EMR and RCM systems
+   - Use deterministic matching (MRN, SSN-last4, phone, email)
+   - Use probabilistic scoring (name similarity + DOB + address)
+   - Build crosswalks from source IDs to canonical patient ID
+   - Extend same approach to Provider/Counterparty graphs (law firms, PI firms)
+
+3. ANALYTICS FRAMEWORK & BI-READY MODEL
+   - Build star schema (dimensions + facts)
+   - Create reports: counterparties by pending AR, patients by balance, denial rates
+   - Support aging bucket analysis and AR tracking
+
+EVALUATION CRITERIA:
+  • Architecture correctness (lineage, replayability, schema evolution)
+  • Data modeling quality (keys, normalization, extensibility)
+  • Entity resolution rigor (confidence scoring, explainability)
+  • Quality & governance (tests, monitoring, PHI controls)
+  • Pragmatism (MVP path + scaling path)
+
+================================================================================
+DATA SOURCES RESEARCHED
+================================================================================
+
+RECOMMENDED FOR MVP:
+
+1. SYNTHEA (Synthetic EMR Data)
+   URL: https://synthetichealth.github.io/synthea/
+   GitHub: https://github.com/synthetichealth/synthea
+   What: Generates synthetic patient populations with complete medical histories
+   Format: FHIR (R4/STU3), CSV, C-CDA
+   Uses: Generate emr_patient, emr_encounter, emr_diagnosis, emr_procedure
+   Cost: Free
+   Setup: 15 minutes
+
+2. CMS NPPES NPI REGISTRY (Real Provider Master Data)
+   URL: https://download.cms.gov/nppes/NPI_Files.html
+   API: https://npiregistry.cms.hhs.gov/api-page
+   What: 10-digit NPI provider identifiers (real, standardized)
+   Format: CSV (comma-separated)
+   Uses: Build dim_provider, identity_entity tables
+   Cost: Free
+   Setup: 5 minutes
+   Update: Weekly/Monthly
+
+3. SYNTHETIC CLAIMS DATA (You generate this)
+   What: Map Synthea encounters to RCM claims
+   Generates: rcm_claim_header, rcm_claim_line, rcm_remittance_835, AR snapshots
+   Uses: Prototype RCM ingestion pipeline
+   Cost: Free
+   Setup: 1-2 hours (Python script)
+
+4. SYNTHETIC REFERRAL ORDERS (You generate this)
+   What: Generate referral orders with counterparty firms
+   Generates: referral_order, referral_order_status_history
+   Includes: Law firms, PI firms, clinics, employers as counterparties
+   Cost: Free
+   Setup: 1-2 hours (Python script)
+
+OPTIONAL FOR VALIDATION:
+
+5. MIMIC-IV (Real ICU/ED Clinical Data)
+   URL: https://physionet.org/content/mimiciv/3.1/
+   What: De-identified real clinical data (2008-2019)
+   Scale: 65K+ ICU patients, 200K+ ED patients
+   Uses: Validate schemas against real data
+   Cost: Free (requires DUA - Data Use Agreement)
+   Setup: 2-4 hours (training + agreement)
+
+REFERENCE:
+
+6. X12 835 REMITTANCE FORMAT
+   PDF: https://www.cms.gov/medicare/billing/electronicbillingeditrans/downloads/835-flatfile.pdf
+   Uses: Understand claim payment/denial structure
+   Cost: Free
+
+================================================================================
+FLOWAI PROJECT NOTES / CHATS
+================================================================================
+
+FINDING: No local FlowAI project notes, chat exports, or supplementary
+documentation found in ~/Downloads, ~/Documents, or ~/Desktop.
+
+IMPLICATION: The PDF case study is the authoritative source. If you have
+discussions with FlowAI team, capture them in a notes file.
+
+================================================================================
+6-PHASE IMPLEMENTATION ROADMAP
+================================================================================
+
+PHASE 1: Research & Design ✅ COMPLETE
+  → Extracted case study requirements
+  → Identified data sources
+  → Designed data schemas
+
+PHASE 2: Data Preparation (2-3 days)
+  → Generate 1,000-5,000 synthetic patients via Synthea
+  → Download CMS NPPES provider data
+  → Create synthetic claims generator script
+  → Create synthetic referral generator script
+  → Map all sources to schema tables
+
+PHASE 3: Ingestion Architecture (3-4 days)
+  → Design Bronze layer (raw ingestion with metadata)
+  → Define data quality validation rules
+  → Implement HIPAA/PHI encryption & access controls
+  → Build Silver layer (cleaned, deduplicated data)
+  → Set up monitoring and freshness checks
+
+PHASE 4: Entity Resolution (4-5 days)
+  → Implement deterministic patient matching (MRN, SSN, phone, email)
+  → Implement probabilistic scoring (name + DOB + address similarity)
+  → Build patient_source_xref (crosswalks with confidence scores)
+  → Extend to Provider/Counterparty identity graphs
+  → Create confidence scoring and evidence trails
+
+PHASE 5: Analytics & BI (2-3 days)
+  → Build Star schema (dimensions + facts)
+  → Create metric layer / semantic models
+  → Design and validate example dashboards
+  → Write sample BI queries (AR, denial, balance reports)
+
+PHASE 6: Documentation & Submission (2-3 days)
+  → Write solution brief with architecture diagrams
+  → Package all code (SQL, Python, dbt)
+  → Create comprehensive test suite
+  → Document assumptions, trade-offs, and future improvements
+
+TOTAL ESTIMATED TIME: 14-18 days (MVP)
+                      3-4 weeks (with BI dashboards)
+                      4-5 weeks (with full documentation & testing)
+
+================================================================================
+TECHNICAL STACK RECOMMENDATIONS
+================================================================================
+
+DATA GENERATION:     Synthea (EMR) + CMS NPPES (providers) + Python scripts
+INGESTION:           Apache Airflow / dbt / Python scripts
+STORAGE:             Snowflake / BigQuery / Redshift
+TRANSFORMATION:      dbt + SQL
+ENTITY RESOLUTION:   Python (pandas, fuzzywuzzy, recordlinkage)
+DATA QUALITY:        dbt tests + Great Expectations
+SECURITY:            AWS KMS / Vault (encryption), RBAC (access control)
+BI/VISUALIZATION:    Tableau / Looker / Power BI
+
+================================================================================
+DELIVERABLES YOU MUST CREATE
+================================================================================
+
+SOLUTION BRIEF (Written Document):
+  ✓ Executive summary
+  ✓ Architecture diagrams (ingestion, entity resolution, BI model)
+  ✓ Data contracts & schema evolution strategy
+  ✓ Data quality framework & governance
+  ✓ Entity resolution methodology (deterministic + probabilistic)
+  ✓ Confidence scoring and error handling
+  ✓ HIPAA compliance approach
+  ✓ Cost/performance trade-offs & scaling paths
+
+CODE & ARTIFACTS:
+  ✓ DDL for Bronze/Silver/Gold table schemas
+  ✓ Data quality validation queries
+  ✓ Entity resolution logic (Python/SQL)
+  ✓ dbt models (if using dbt)
+  ✓ BI dashboard definitions
+  ✓ Data generation scripts (Synthea, synthetic claims/referrals)
+
+TESTING & VALIDATION:
+  ✓ Unit tests for entity resolution
+  ✓ Data quality test suite
+  ✓ Lineage verification
+  ✓ Sample query outputs (validate BI questions)
+  ✓ Documentation of assumptions & limitations
+
+================================================================================
+KEY DECISIONS FOR YOUR SOLUTION
+================================================================================
+
+1. ENTITY RESOLUTION APPROACH
+   Decision: Two-step (deterministic first, then probabilistic)
+   Rationale: High-confidence matches first; probabilistic as fallback
+   Confidence thresholds: 0.95+ deterministic, 0.75+ probabilistic
+
+2. MEDALLION PATTERN
+   Decision: Use Bronze → Silver → Gold layering
+   Rationale: Clear separation of concerns; supports auditing & replay
+
+3. DATA QUALITY OWNERSHIP
+   Decision: Define SLAs per source system
+   Rationale: Each source has different reliability expectations
+
+4. PHI HANDLING
+   Decision: Encrypt at rest (AES-256), in transit (TLS), audit all access
+   Rationale: HIPAA required; build compliance from day one
+
+5. MVP SCALE
+   Decision: 1,000-5,000 synthetic patients initially
+   Rationale: Proves concepts without infrastructure burden
+
+6. IDENTITY GRAPH STORAGE
+   Decision: Relational tables (identity_entity, identity_identifier, identity_edge)
+   Rationale: Simpler than graph DB for MVP; scales to production warehouse
+
+================================================================================
+RECOMMENDED MVP DATA COMBINATION
+================================================================================
+
+1. EMR Source:      Synthea (generates 1,000-5,000 patients in CSV format)
+2. Provider Master: CMS NPPES (free, real provider directory)
+3. RCM/Claims:      Synthetic (you map Synthea encounters → claims)
+4. Referral Orders: Synthetic (you generate referral data with counterparties)
+5. Optional:        MIMIC-IV (if DUA obtained, for validation)
+
+This combination balances:
+  • Speed (Synthea generates data in minutes)
+  • Realism (real provider data from CMS)
+  • Practicality (no privacy constraints)
+  • Robustness (can validate against real MIMIC data later)
+
+================================================================================
+EVALUATION RUBRIC (How You'll Be Scored)
+================================================================================
+
+1. Architecture Correctness (30%)
+   → Reliable ingestion, data lineage, replayability, schema evolution
+
+2. Data Modeling Quality (20%)
+   → Clear primary/foreign keys, normalization vs analytics modeling, extensibility
+
+3. Entity Resolution Rigor (20%)
+   → Accurate crosswalks, confidence scoring, explainability, error handling
+
+4. Quality & Governance (20%)
+   → Data quality tests, monitoring, PHI security, HIPAA compliance
+
+5. Pragmatism (10%)
+   → MVP path clear, scaling path articulated, cost/performance awareness
+
+================================================================================
+DOCUMENTS CREATED FOR YOU
+================================================================================
+
+1. FlowAI_DE_Case_Study_Research_Plan.md (7000+ words)
+   → Comprehensive planning document
+   → All requirements, schemas, implementation roadmap
+   → Technical recommendations and references
+
+2. FlowAI_Case_Study_Cheat_Sheet.md (One-pager)
+   → Quick reference for all schemas
+   → Entity resolution strategy
+   → BI queries, data quality checklist
+   → Evaluation rubric
+
+3. Data_Sources_Reference.md (Complete guide)
+   → All data sources with direct download links
+   → Setup instructions for each source
+   → Recommended combination for MVP
+   → Troubleshooting FAQ
+
+4. RESEARCH_SUMMARY.txt (This file)
+   → Executive summary of all findings
+
+================================================================================
+NEXT IMMEDIATE ACTIONS
+================================================================================
+
+BEFORE YOU START IMPLEMENTING:
+
+1. Download and scan Synthea repository
+   git clone https://github.com/synthetichealth/synthea.git
+
+2. Review the case study PDF (17 pages, sections A/B/C)
+   ~/Downloads/DE Case Study.pdf
+
+3. Read the quick reference cheat sheet
+   ~/Downloads/FlowAI_Case_Study_Cheat_Sheet.md
+
+4. Review data sources reference guide
+   ~/Downloads/Data_Sources_Reference.md
+
+WHEN READY FOR PHASE 2:
+
+5. Generate Synthea patients (1,000-5,000)
+   ./run_synthea.sh -p 1000 --exporter.csv.export=true
+
+6. Download CMS NPPES file
+   https://download.cms.gov/nppes/NPI_Files.html
+
+7. Create Python script to generate synthetic claims from Synthea
+
+8. Create Python script to generate synthetic referral orders
+
+9. Begin mapping sources to schema tables (Phase 2)
+
+================================================================================
+QUESTIONS TO CLARIFY WITH FLOWAI
+================================================================================
+
+1. Should I prioritize real data (MIMIC-IV) or synthetic (Synthea)?
+2. Are there any existing FlowAI discussions/Slack notes about this project?
+3. What is expected final data volume (MVP vs production scale)?
+4. Any preferences on data warehouse (Snowflake vs BigQuery vs other)?
+5. Should I include optional features (denial analysis, cost accounting)?
+6. What is the timeline expectation for this submission?
+
+================================================================================
+RESOURCES & LINKS
+================================================================================
+
+OFFICIAL DOCUMENTATION:
+  • Synthea: https://synthetichealth.github.io/synthea/
+  • MIMIC-IV: https://physionet.org/content/mimiciv/3.1/
+  • CMS NPPES: https://download.cms.gov/nppes/NPI_Files.html
+
+GITHUB:
+  • Synthea: https://github.com/synthetichealth/synthea
+  • Awesome Medical Datasets: https://github.com/openmedlab/Awesome-Medical-Dataset
+
+REFERENCE MATERIALS:
+  • X12 835 Format: https://www.cms.gov/medicare/billing/electronicbillingeditrans/downloads/835-flatfile.pdf
+  • MIMIC-IV Paper: https://www.nature.com/articles/s41597-022-01899-x
+
+================================================================================
+DOCUMENT VERSION: 1.0
+CREATED: April 2, 2026
+STATUS: Research Complete - Ready for Implementation Phase 2
+
+NO CODE HAS BEEN WRITTEN
+NO DATA HAS BEEN GENERATED
+This is purely research and planning as requested.
+================================================================================

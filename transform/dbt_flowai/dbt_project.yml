@@ -1,0 +1,28 @@
+name: 'dbt_flowai'
+version: '1.0.0'
+config-version: 2
+
+profile: 'dbt_flowai'
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  dbt_flowai:
+    staging:
+      +materialized: view
+      +schema: bronze
+    silver:
+      +materialized: table
+      +schema: silver
+    gold:
+      entity_resolution:
+        +materialized: table
+        +schema: gold
+      analytics:
+        +materialized: table
+        +schema: gold
