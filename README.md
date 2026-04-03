@@ -192,13 +192,3 @@ flow-ai/
 | Gold (ER) | 6 | 5,575 | 738 canonical patients |
 | Gold (Analytics) | 9 | 12,771 | Star schema, 100% dim coverage |
 
----
-
-## Documentation
-
-| Document | Description |
-|----------|-------------|
-| `docs/SOLUTION_BRIEF.md` | Full case study submission (Sections A, B, C) |
-| `docs/ENTITY_RESOLUTION.md` | Matching rules, scoring weights, survivorship |
-| `docs/ANALYTICS_FRAMEWORK.md` | Star schema, grain definitions, BI SQL |
-| `docs/SILVER_LAYER.md` | Transformations, test results, row counts |
