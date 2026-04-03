@@ -19,3 +19,7 @@ models:
     silver:
       +materialized: table
       +schema: silver
+    gold:
+      entity_resolution:
+        +materialized: table
+        +schema: gold
