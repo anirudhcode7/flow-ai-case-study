@@ -1,0 +1,141 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Standard date dimension covering 2022-2027 with fiscal year (Oct 1 start)"
+    columns:
+      - name: date_key
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_provider
+    description: "Canonical provider dimension from EMR + external NPIs from claims/referrals"
+    columns:
+      - name: provider_key
+        tests:
+          - unique
+          - not_null
+      - name: npi
+        description: "NPI may have duplicates if same NPI appears with different source_provider_ids"
+
+  - name: dim_facility
+    description: "Facility dimension from encounters, claims, and referrals"
+    columns:
+      - name: facility_key
+        tests:
+          - unique
+          - not_null
+      - name: source_facility_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_counterparty_org
+    description: "Counterparty organizations (law firms, PI firms, clinics, employers) from referrals"
+    columns:
+      - name: counterparty_org_key
+        tests:
+          - unique
+          - not_null
+      - name: counterparty_org_type
+        tests:
+          - accepted_values:
+              values: ['law_firm', 'pi_firm', 'clinic', 'employer']
+
+  - name: dim_payer
+    description: "Insurance payer dimension from claims"
+    columns:
+      - name: payer_key
+        tests:
+          - unique
+          - not_null
+      - name: payer_name
+        tests:
+          - unique
+          - not_null
+
+  - name: bridge_patient_counterparty
+    description: "Many-to-many bridge between patients and counterparty organizations via referrals"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_id
+            - counterparty_org_key
+    columns:
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('gold_dim_patient')
+              field: patient_id
+      - name: counterparty_org_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_counterparty_org')
+              field: counterparty_org_key
+
+  - name: fact_receivable
+    description: "AR fact table at claim + snapshot_date grain"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - snapshot_date
+    columns:
+      - name: claim_id
+        tests:
+          - not_null
+      - name: snapshot_date
+        tests:
+          - not_null
+      - name: total_ar_balance
+        tests:
+          - not_null
+      - name: payer_key
+        description: "May be null if payer not found in dim"
+      - name: patient_id
+        description: "May be null if rcm_account could not be resolved to a patient"
+
+  - name: fact_patient_balance
+    description: "Patient-level AR aggregation at patient + snapshot_date grain"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_id
+            - snapshot_date
+    columns:
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('gold_dim_patient')
+              field: patient_id
+      - name: snapshot_date
+        tests:
+          - not_null
+      - name: total_outstanding
+        tests:
+          - not_null
+
+  - name: fact_claim_line
+    description: "Claim line-level fact for denial and CPT analysis"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - line_num
+    columns:
+      - name: claim_id
+        tests:
+          - not_null
+      - name: line_num
+        tests:
+          - not_null
+      - name: charge_amount
+        tests:
+          - not_null
+      - name: is_denied
+        tests:
+          - not_null
