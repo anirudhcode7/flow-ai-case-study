@@ -23,3 +23,6 @@ models:
       entity_resolution:
         +materialized: table
         +schema: gold
+      analytics:
+        +materialized: table
+        +schema: gold
